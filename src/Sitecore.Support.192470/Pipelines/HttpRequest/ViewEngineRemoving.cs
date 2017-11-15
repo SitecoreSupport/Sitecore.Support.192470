@@ -9,22 +9,20 @@ using System.Web.Mvc;
 
 namespace Sitecore.Support.Pipelines.HttpRequest
 {
-    public class ViewEngineRemoving: HttpRequestProcessor
+    public class ViewEngineRemoving : HttpRequestProcessor
     {
         private static bool flag = false;
         public override void Process(HttpRequestArgs args)
         {
             if (!flag)
             {
-                for (int i = 0; i < ViewEngines.Engines.Count; i++)
+                var itemToRemove = ViewEngines.Engines.Where(i => i.GetType().Equals(typeof(PrecompiledMvcEngine))).ToList();
+
+                for (int i = 0; i < itemToRemove.Count; i++)
                 {
-                    var precompiledViewEngine = ViewEngines.Engines[0] as PrecompiledMvcEngine;
-                    if (precompiledViewEngine != null)
-                    {
-                        ViewEngines.Engines.Remove(precompiledViewEngine);
-                        flag = true;
-                    }
+                    ViewEngines.Engines.Remove(itemToRemove[i]);
                 }
+                flag = true;
             }
         }
     }
